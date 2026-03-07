@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-reminders
+      author: mayfak
+      changes:
+        - createTable:
+            tableName: reminders
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: description
+                  type: varchar(4096)
+
+              - column:
+                  name: remind
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: notified_at
+                  type: timestamp with time zone
+
+        - addForeignKeyConstraint:
+            baseTableName: reminders
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_reminders_user
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: reminders
+            indexName: idx_reminders_user_remind
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: remind
+
+        - createIndex:
+            tableName: reminders
+            indexName: idx_reminders_title
+            columns:
+              - column:
+                  name: title

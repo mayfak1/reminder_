@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-user-profile
+      author: mayfak
+      changes:
+        - createTable:
+            tableName: user_profile
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+              - column:
+                  name: telegram_chat_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    unique: true
+
+        - addForeignKeyConstraint:
+            baseTableName: user_profile
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_profile_user
+            onDelete: CASCADE

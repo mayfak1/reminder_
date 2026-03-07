@@ -1,0 +1,13 @@
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/notification/SmtpEmailSenderTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/notification/TelegramBotSenderTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/repository/ReminderRepositorySpecAdditionalTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/repository/ReminderRepositorySpecTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/scheduler/ReminderNotifyJobTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/security/SecuritySmokeTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/service/CurrentUserServiceTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/service/NotificationServiceImplTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/service/ReminderServiceImplTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/testutil/TestData.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/web/ReminderControllerTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/web/RestTelegramApiClientTest.java
+/Users/konstantinmokrousov/Documents/reminder/src/test/java/com/example/reminder/web/UserProfileControllerTest.java

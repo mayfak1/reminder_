@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-users
+      author: mayfak
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: oauth2_subject
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: users
+            columnNames: oauth2_subject
+            constraintName: uq_users_oauth2_subject

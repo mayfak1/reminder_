@@ -1,0 +1,83 @@
+services:
+  db:
+    image: postgres:16
+    container_name: reminder-db
+    environment:
+      POSTGRES_DB: reminder
+      POSTGRES_USER: reminder
+      POSTGRES_PASSWORD: reminder
+    ports:
+      - "5432:5432"
+    volumes:
+      - reminder_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U reminder -d reminder"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  keycloak-db:
+    image: postgres:16
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - keycloak_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL","pg_isready -U keycloak -d keycloak" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: reminder-keycloak
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    command: [ "start-dev", "--health-enabled=true" ]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_HEALTH_ENABLED: "true"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      KC_HOSTNAME: keycloak
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "8081:8080"
+  app:
+    build: .
+    container_name: reminder-app
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/reminder
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY_OAUTH2_JWT: TRACE
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY_OAUTH2_CORE: TRACE
+      LOGGING_LEVEL_COM_NIMBUSDS: DEBUG
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/reminder
+      SPRING_DATASOURCE_USERNAME: reminder
+      SPRING_DATASOURCE_PASSWORD: reminder
+      SPRING_LIQUIBASE_ENABLED: "true"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY_OAUTH2: DEBUG
+
+      APP_NOTIFY_FIXED_DELAY_MS: 5000
+volumes:
+  reminder_pgdata:
+  keycloak_pgdata:

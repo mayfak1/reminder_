@@ -1,0 +1,13 @@
+com/example/reminder/repository/ReminderRepositorySpecTest.class
+com/example/reminder/web/UserProfileControllerTest.class
+com/example/reminder/notification/TelegramBotSenderTest.class
+com/example/reminder/service/ReminderServiceImplTest.class
+com/example/reminder/web/ReminderControllerTest.class
+com/example/reminder/service/CurrentUserServiceTest.class
+com/example/reminder/web/RestTelegramApiClientTest.class
+com/example/reminder/notification/SmtpEmailSenderTest.class
+com/example/reminder/security/SecuritySmokeTest.class
+com/example/reminder/scheduler/ReminderNotifyJobTest.class
+com/example/reminder/testutil/TestData.class
+com/example/reminder/repository/ReminderRepositorySpecAdditionalTest.class
+com/example/reminder/service/NotificationServiceImplTest.class
