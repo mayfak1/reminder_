@@ -9,32 +9,31 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 
 @Configuration
 @EnableWebSecurity
 @Slf4j
 public class SecurityConfig {
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/actuator/health",
+            "/actuator/info"
+    };
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.debug("Config: building security filter chain");
+
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
-                .build();
-    }
-    @Bean
-    JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder
-                .withJwkSetUri("http://keycloak:8080/realms/reminder/protocol/openid-connect/certs")
-                .jwsAlgorithm(SignatureAlgorithm.RS256)
                 .build();
     }
 }

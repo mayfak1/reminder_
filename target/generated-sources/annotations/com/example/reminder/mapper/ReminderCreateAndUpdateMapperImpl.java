@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-04T07:34:20+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 25 (Eclipse Adoptium)"
+    date = "2026-05-24T13:45:53+0700",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 24.0.2 (Homebrew)"
 )
 @Component
 public class ReminderCreateAndUpdateMapperImpl implements ReminderCreateAndUpdateMapper {

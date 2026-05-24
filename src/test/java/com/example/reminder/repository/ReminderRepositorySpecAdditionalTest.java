@@ -2,6 +2,7 @@ package com.example.reminder.repository;
 
 import com.example.reminder.testutil.TestData;
 import com.example.reminder.domain.reminder.Reminder;
+import com.example.reminder.domain.reminder.ReminderNotificationStatus;
 import com.example.reminder.domain.reminder.ReminderSpecifications;
 import com.example.reminder.domain.user.User;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -88,6 +90,46 @@ class ReminderRepositorySpecAdditionalTest {
         );
     }
 
+    @Test
+    void shouldFindOnlyDueIdsForNotification() {
+        User user = userRepository.save(userWithSubject("notify-u1"));
+        Instant now = Instant.parse("2026-03-16T12:00:00Z");
+
+        Reminder due = reminderRepository.save(TestData.reminder(user, "Due", "pending", now.minusSeconds(60)));
+
+        Reminder retryDue = TestData.reminder(user, "Retry", "failed", now.minusSeconds(30));
+        retryDue.setStatus(ReminderNotificationStatus.FAILED);
+        retryDue.setAttemptCount(1);
+        retryDue.setNextAttemptAt(now.minusSeconds(1));
+        retryDue = reminderRepository.save(retryDue);
+
+        Reminder future = TestData.reminder(user, "Future", "pending", now.plusSeconds(60));
+        reminderRepository.save(future);
+
+        Reminder retryLater = TestData.reminder(user, "Retry later", "failed", now.minusSeconds(30));
+        retryLater.setStatus(ReminderNotificationStatus.FAILED);
+        retryLater.setAttemptCount(1);
+        retryLater.setNextAttemptAt(now.plusSeconds(60));
+        reminderRepository.save(retryLater);
+
+        Reminder exhausted = TestData.reminder(user, "Exhausted", "failed", now.minusSeconds(30));
+        exhausted.setStatus(ReminderNotificationStatus.FAILED);
+        exhausted.setAttemptCount(3);
+        reminderRepository.save(exhausted);
+
+        Reminder sent = TestData.reminder(user, "Sent", "already sent", now.minusSeconds(30));
+        sent.setStatus(ReminderNotificationStatus.SENT);
+        reminderRepository.save(sent);
+
+        List<Long> dueIds = reminderRepository.findDueIdsForNotification(
+                List.of(ReminderNotificationStatus.PENDING, ReminderNotificationStatus.FAILED),
+                now,
+                3
+        );
+
+        assertThat(dueIds).containsExactly(due.getId(), retryDue.getId());
+    }
+
     private User userWithSubject(String subject) {
         User u = new User();
         u.setOauth2Subject(subject);
@@ -95,4 +137,3 @@ class ReminderRepositorySpecAdditionalTest {
         return u;
     }
 }
-

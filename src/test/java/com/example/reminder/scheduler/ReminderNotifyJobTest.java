@@ -1,10 +1,7 @@
 package com.example.reminder.scheduler;
 
-import com.example.reminder.domain.reminder.ReminderNotificationStatus;
-import com.example.reminder.testutil.TestData;
-import com.example.reminder.domain.reminder.Reminder;
 import com.example.reminder.repository.ReminderRepository;
-import com.example.reminder.service.notification.NotificationService;
+import com.example.reminder.service.scheduler.ReminderNotificationWorker;
 import com.example.reminder.service.scheduler.ReminderNotifyJob;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +31,7 @@ class ReminderNotifyJobTest {
     ReminderRepository reminderRepository;
 
     @Mock
-    NotificationService notificationService;
+    ReminderNotificationWorker reminderNotificationWorker;
 
     @InjectMocks
     ReminderNotifyJob reminderNotifyJob;
@@ -46,7 +43,7 @@ class ReminderNotifyJobTest {
 
     @Test
     void shouldQueryDueRemindersByCurrentInstantAndSkipWhenEmpty() {
-        when(reminderRepository.findDueForNotification(anyCollection(), any(), anyInt())).thenReturn(List.of());
+        when(reminderRepository.findDueIdsForNotification(anyCollection(), any(), anyInt())).thenReturn(List.of());
         Instant before = Instant.now();
 
         reminderNotifyJob.run();
@@ -54,82 +51,47 @@ class ReminderNotifyJobTest {
 
         ArgumentCaptor<Instant> nowCaptor = ArgumentCaptor.forClass(Instant.class);
         ArgumentCaptor<Integer> maxAttemptsCaptor = ArgumentCaptor.forClass(Integer.class);
-        verify(reminderRepository).findDueForNotification(anyCollection(), nowCaptor.capture(), maxAttemptsCaptor.capture());
+        verify(reminderRepository).findDueIdsForNotification(anyCollection(), nowCaptor.capture(), maxAttemptsCaptor.capture());
         assertThat(nowCaptor.getValue()).isBetween(before, after);
         assertThat(maxAttemptsCaptor.getValue()).isEqualTo(3);
-        verifyNoInteractions(notificationService);
+        verifyNoInteractions(reminderNotificationWorker);
     }
 
     @Test
-    void shouldMarkAsSentAfterSuccessfulNotification() {
-        Reminder due = TestData.reminderDue(1L);
-        due.setNotifiedAt(null);
-        when(reminderRepository.findDueForNotification(anyCollection(), any(), anyInt())).thenReturn(List.of(due));
-        when(notificationService.notify(due)).thenReturn(true);
+    void shouldSubmitEachDueReminderToWorker() {
+        when(reminderRepository.findDueIdsForNotification(anyCollection(), any(), anyInt()))
+                .thenReturn(List.of(1L, 2L));
 
         reminderNotifyJob.run();
 
-        verify(notificationService).notify(due);
-        assertThat(due.getStatus()).isEqualTo(ReminderNotificationStatus.SENT);
-        assertThat(due.getNotifiedAt()).isNotNull();
-        assertThat(due.getAttemptCount()).isEqualTo(1);
-        assertThat(due.getLastAttemptAt()).isNotNull();
-        assertThat(due.getNextAttemptAt()).isNull();
+        verify(reminderNotificationWorker).process(1L, 3);
+        verify(reminderNotificationWorker).process(2L, 3);
     }
 
     @Test
-    void shouldScheduleRetryWhenNotificationFails() {
-        Reminder bad = TestData.reminderDue(2L);
-        bad.setNotifiedAt(null);
-        when(reminderRepository.findDueForNotification(anyCollection(), any(), anyInt()))
-                .thenReturn(List.of(bad));
-        when(notificationService.notify(bad)).thenReturn(false);
+    void shouldUseAtLeastOneMaxAttempt() {
+        ReflectionTestUtils.setField(reminderNotifyJob, "maxAttempts", 0);
+        when(reminderRepository.findDueIdsForNotification(anyCollection(), any(), anyInt()))
+                .thenReturn(List.of(10L));
 
         reminderNotifyJob.run();
 
-        verify(notificationService).notify(bad);
-        assertThat(bad.getStatus()).isEqualTo(ReminderNotificationStatus.FAILED);
-        assertThat(bad.getNotifiedAt()).isNull();
-        assertThat(bad.getAttemptCount()).isEqualTo(1);
-        assertThat(bad.getLastAttemptAt()).isNotNull();
-        assertThat(bad.getNextAttemptAt()).isNotNull();
-        assertThat(bad.getNextAttemptAt()).isAfter(bad.getLastAttemptAt());
+        ArgumentCaptor<Integer> maxAttemptsCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(reminderRepository).findDueIdsForNotification(anyCollection(), any(), maxAttemptsCaptor.capture());
+        assertThat(maxAttemptsCaptor.getValue()).isEqualTo(1);
+        verify(reminderNotificationWorker).process(10L, 1);
     }
 
     @Test
-    void shouldStopRetryWhenMaxAttemptsReached() {
-        Reminder reminder = TestData.reminderDue(10L);
-        reminder.setAttemptCount(2);
-        reminder.setNotifiedAt(null);
-        when(reminderRepository.findDueForNotification(anyCollection(), any(), anyInt()))
-                .thenReturn(List.of(reminder));
-        when(notificationService.notify(reminder)).thenReturn(false);
+    void shouldContinueSubmittingWhenOneWorkerCallFails() {
+        when(reminderRepository.findDueIdsForNotification(anyCollection(), any(), anyInt()))
+                .thenReturn(List.of(1L, 2L));
+        doThrow(new RuntimeException("queue is full"))
+                .when(reminderNotificationWorker).process(1L, 3);
 
         reminderNotifyJob.run();
 
-        verify(notificationService).notify(reminder);
-        assertThat(reminder.getAttemptCount()).isEqualTo(3);
-        assertThat(reminder.getStatus()).isEqualTo(ReminderNotificationStatus.FAILED);
-        assertThat(reminder.getNextAttemptAt()).isNull();
-        assertThat(reminder.getNotifiedAt()).isNull();
-    }
-
-    @Test
-    void shouldTreatThrownNotificationErrorAsFailureAndContinue() {
-        Reminder broken = TestData.reminderDue(11L);
-        Reminder ok = TestData.reminderDue(12L);
-        when(reminderRepository.findDueForNotification(anyCollection(), any(), anyInt()))
-                .thenReturn(List.of(broken, ok));
-        doThrow(new RuntimeException("boom")).when(notificationService).notify(broken);
-        when(notificationService.notify(ok)).thenReturn(true);
-
-        reminderNotifyJob.run();
-
-        verify(notificationService).notify(broken);
-        verify(notificationService).notify(ok);
-        assertThat(broken.getStatus()).isEqualTo(ReminderNotificationStatus.FAILED);
-        assertThat(broken.getNotifiedAt()).isNull();
-        assertThat(ok.getStatus()).isEqualTo(ReminderNotificationStatus.SENT);
-        assertThat(ok.getNotifiedAt()).isNotNull();
+        verify(reminderNotificationWorker).process(1L, 3);
+        verify(reminderNotificationWorker).process(2L, 3);
     }
 }

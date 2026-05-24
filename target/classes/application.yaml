@@ -2,6 +2,8 @@ app:
   notify:
     fixed-delay-ms: ${APP_NOTIFY_FIXED_DELAY_MS:30000}
     max-attempts: ${APP_NOTIFY_MAX_ATTEMPTS:5}
+    worker-threads: ${APP_NOTIFY_WORKER_THREADS:4}
+    queue-capacity: ${APP_NOTIFY_QUEUE_CAPACITY:100}
   telegram:
     bot-token: ${TELEGRAM_BOT_TOKEN:}
 
@@ -11,6 +13,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://keycloak:8080/realms/reminder}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI:http://keycloak:8080/realms/reminder/protocol/openid-connect/certs}
 
   mail:
     host: ${SMTP_HOST:smtp.gmail.com}

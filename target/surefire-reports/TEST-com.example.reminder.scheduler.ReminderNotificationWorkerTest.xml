@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.example.reminder.repository.ReminderRepositorySpecAdditionalTest" time="0.06" tests="4" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.example.reminder.scheduler.ReminderNotificationWorkerTest" time="0.141" tests="5" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="24"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -46,6 +46,7 @@
     <property name="localRepository" value="/Users/konstantinmokrousov/.m2/repository"/>
     <property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues"/>
     <property name="java.io.tmpdir" value="/var/folders/dw/jb40w6pj1x79vdfphxd5bdnh0000gn/T/"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
     <property name="java.version" value="24.0.2"/>
     <property name="user.dir" value="/Users/konstantinmokrousov/reminder"/>
     <property name="os.arch" value="aarch64"/>
@@ -61,42 +62,109 @@
     <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
     <property name="java.class.version" value="68.0"/>
   </properties>
-  <testcase name="shouldFilterDateWithInclusiveStartAndExclusiveEnd" classname="com.example.reminder.repository.ReminderRepositorySpecAdditionalTest" time="0.013">
-    <system-out><![CDATA[2026-05-24T13:47:10.468+07:00  INFO 53011 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.example.reminder.repository.ReminderRepositorySpecAdditionalTest]: ReminderRepositorySpecAdditionalTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-05-24T13:47:10.474+07:00  INFO 53011 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.example.reminder.ReminderApplication for test class com.example.reminder.repository.ReminderRepositorySpecAdditionalTest
-Hibernate: insert into users (created_at,oauth2_subject,id) values (?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: select r1_0.id,r1_0.attempt_count,r1_0.description,r1_0.last_attempt_at,r1_0.next_attempt_at,r1_0.notified_at,r1_0.remind,r1_0.status,r1_0.title,r1_0.user_id from reminders r1_0 where r1_0.user_id=? and r1_0.remind>=? and r1_0.remind<? offset ? rows fetch first ? rows only
+  <testcase name="shouldStopRetryWhenMaxAttemptsReached" classname="com.example.reminder.scheduler.ReminderNotificationWorkerTest" time="0.134">
+    <system-out><![CDATA[2026-05-24T13:47:13.105+07:00  WARN 53011 --- [           main] c.e.r.s.s.ReminderNotificationWorker     : ReminderWorker: exhausted retries reminderId=10 attempts=3
 ]]></system-out>
   </testcase>
-  <testcase name="shouldIgnoreBlankQueryAndNullDateFilter" classname="com.example.reminder.repository.ReminderRepositorySpecAdditionalTest" time="0.009">
-    <system-out><![CDATA[Hibernate: insert into users (created_at,oauth2_subject,id) values (?,?,default)
-Hibernate: insert into users (created_at,oauth2_subject,id) values (?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: select r1_0.id,r1_0.attempt_count,r1_0.description,r1_0.last_attempt_at,r1_0.next_attempt_at,r1_0.notified_at,r1_0.remind,r1_0.status,r1_0.title,r1_0.user_id from reminders r1_0 where r1_0.user_id=? offset ? rows fetch first ? rows only
+  <testcase name="shouldSkipWhenReminderIsNoLongerProcessable" classname="com.example.reminder.scheduler.ReminderNotificationWorkerTest" time="0.002">
+    <system-out><![CDATA[2026-05-24T13:47:13.107+07:00 DEBUG 53011 --- [           main] c.e.r.s.s.ReminderNotificationWorker     : ReminderWorker: skip reminderId=12 status=SENT remindAt=2026-05-24T06:47:03.106613Z nextAttemptAt=null attempts=0
 ]]></system-out>
   </testcase>
-  <testcase name="shouldSearchCaseInsensitiveInTitleAndDescription" classname="com.example.reminder.repository.ReminderRepositorySpecAdditionalTest" time="0.008">
-    <system-out><![CDATA[Hibernate: insert into users (created_at,oauth2_subject,id) values (?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: select r1_0.id,r1_0.attempt_count,r1_0.description,r1_0.last_attempt_at,r1_0.next_attempt_at,r1_0.notified_at,r1_0.remind,r1_0.status,r1_0.title,r1_0.user_id from reminders r1_0 where r1_0.user_id=? and (lower(r1_0.title) like ? escape '' or lower(r1_0.description) like ? escape '') offset ? rows fetch first ? rows only
+  <testcase name="shouldScheduleRetryWhenNotificationFails" classname="com.example.reminder.scheduler.ReminderNotificationWorkerTest" time="0.001">
+    <system-out><![CDATA[2026-05-24T13:47:13.108+07:00  INFO 53011 --- [           main] c.e.r.s.s.ReminderNotificationWorker     : ReminderWorker: scheduled retry reminderId=2 attempt=1 nextAttemptAt=2026-05-24T06:48:13.108483Z backoffSeconds=60
 ]]></system-out>
   </testcase>
-  <testcase name="shouldFindOnlyDueIdsForNotification" classname="com.example.reminder.repository.ReminderRepositorySpecAdditionalTest" time="0.016">
-    <system-out><![CDATA[Hibernate: insert into users (created_at,oauth2_subject,id) values (?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: insert into reminders (attempt_count,description,last_attempt_at,next_attempt_at,notified_at,remind,status,title,user_id,id) values (?,?,?,?,?,?,?,?,?,default)
-Hibernate: select r1_0.id from reminders r1_0 where r1_0.status in (?,?) and r1_0.remind<=? and r1_0.attempt_count<? and (r1_0.next_attempt_at is null or r1_0.next_attempt_at<=?) order by r1_0.remind
+  <testcase name="shouldMarkAsSentAfterSuccessfulNotification" classname="com.example.reminder.scheduler.ReminderNotificationWorkerTest" time="0.001">
+    <system-out><![CDATA[2026-05-24T13:47:13.110+07:00  INFO 53011 --- [           main] c.e.r.s.s.ReminderNotificationWorker     : ReminderWorker: sent reminderId=1 attempt=1
+]]></system-out>
+  </testcase>
+  <testcase name="shouldTreatThrownNotificationErrorAsFailure" classname="com.example.reminder.scheduler.ReminderNotificationWorkerTest" time="0.002">
+    <system-out><![CDATA[2026-05-24T13:47:13.111+07:00  WARN 53011 --- [           main] c.e.r.s.s.ReminderNotificationWorker     : ReminderWorker: notify threw exception reminderId=11 message=boom
+
+java.lang.RuntimeException: boom
+	at com.example.reminder.service.scheduler.ReminderNotificationWorker.processInternal(ReminderNotificationWorker.java:73) ~[classes/:na]
+	at com.example.reminder.service.scheduler.ReminderNotificationWorker.process(ReminderNotificationWorker.java:39) ~[classes/:na]
+	at com.example.reminder.scheduler.ReminderNotificationWorkerTest.shouldTreatThrownNotificationErrorAsFailure(ReminderNotificationWorkerTest.java:94) ~[test-classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:93) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:48) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$0(InterceptingLauncher.java:41) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:40) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:48) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.2.5.jar:3.2.5]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) ~[surefire-junit-platform-3.2.5.jar:3.2.5]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) ~[surefire-junit-platform-3.2.5.jar:3.2.5]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) ~[surefire-junit-platform-3.2.5.jar:3.2.5]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.2.5.jar:3.2.5]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.2.5.jar:3.2.5]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.2.5.jar:3.2.5]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.2.5.jar:3.2.5]
+
+2026-05-24T13:47:13.111+07:00  INFO 53011 --- [           main] c.e.r.s.s.ReminderNotificationWorker     : ReminderWorker: scheduled retry reminderId=11 attempt=1 nextAttemptAt=2026-05-24T06:48:13.111221Z backoffSeconds=60
 ]]></system-out>
   </testcase>
 </testsuite>

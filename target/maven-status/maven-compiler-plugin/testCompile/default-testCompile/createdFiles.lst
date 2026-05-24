@@ -1,3 +1,4 @@
+com/example/reminder/scheduler/ReminderNotificationWorkerTest.class
 com/example/reminder/repository/ReminderRepositorySpecTest.class
 com/example/reminder/web/UserProfileControllerTest.class
 com/example/reminder/notification/TelegramBotSenderTest.class
