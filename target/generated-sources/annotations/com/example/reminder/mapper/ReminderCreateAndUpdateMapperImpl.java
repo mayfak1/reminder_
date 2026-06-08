@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-24T13:45:53+0700",
+    date = "2026-06-08T15:29:14+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 24.0.2 (Homebrew)"
 )
 @Component
@@ -21,13 +21,13 @@ public class ReminderCreateAndUpdateMapperImpl implements ReminderCreateAndUpdat
             return null;
         }
 
-        Reminder reminder = new Reminder();
+        Reminder.ReminderBuilder reminder = Reminder.builder();
 
-        reminder.setTitle( requestAndResponse.title() );
-        reminder.setDescription( requestAndResponse.description() );
-        reminder.setRemind( requestAndResponse.remind() );
+        reminder.title( requestAndResponse.title() );
+        reminder.description( requestAndResponse.description() );
+        reminder.remind( requestAndResponse.remind() );
 
-        return reminder;
+        return reminder.build();
     }
 
     @Override
@@ -49,5 +49,20 @@ public class ReminderCreateAndUpdateMapperImpl implements ReminderCreateAndUpdat
         ReminderResponse reminderResponse = new ReminderResponse( id, title, description, remind );
 
         return reminderResponse;
+    }
+
+    @Override
+    public Reminder updateEntity(ReminderCreateAndUpdateRequest update) {
+        if ( update == null ) {
+            return null;
+        }
+
+        Reminder.ReminderBuilder reminder = Reminder.builder();
+
+        reminder.title( update.title() );
+        reminder.description( update.description() );
+        reminder.remind( update.remind() );
+
+        return reminder.build();
     }
 }

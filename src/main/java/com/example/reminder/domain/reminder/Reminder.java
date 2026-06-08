@@ -3,9 +3,7 @@ package com.example.reminder.domain.reminder;
 import com.example.reminder.domain.user.User;
 import com.example.reminder.dto.reminder.ReminderCreateAndUpdateRequest;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 
@@ -13,7 +11,9 @@ import java.time.Instant;
 @Table(name = "reminders")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Reminder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,14 +49,5 @@ public class Reminder {
     private Instant nextAttemptAt;
 
 
-    public void updateEntity(ReminderCreateAndUpdateRequest update, Reminder reminder) {
-        reminder.setRemind(update.remind());
-        reminder.setTitle(update.title());
-        reminder.setDescription(update.description());
-        reminder.setNotifiedAt(null);
-        reminder.setStatus(ReminderNotificationStatus.PENDING);
-        reminder.setAttemptCount(0);
-        reminder.setLastAttemptAt(null);
-        reminder.setNextAttemptAt(null);
-    }
+
 }

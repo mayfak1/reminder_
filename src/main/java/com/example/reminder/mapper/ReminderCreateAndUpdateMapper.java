@@ -2,6 +2,7 @@ package com.example.reminder.mapper;
 
 
 import com.example.reminder.domain.reminder.Reminder;
+import com.example.reminder.domain.reminder.ReminderNotificationStatus;
 import com.example.reminder.dto.reminder.ReminderCreateAndUpdateRequest;
 import com.example.reminder.dto.reminder.ReminderResponse;
 import org.mapstruct.Mapper;
@@ -10,5 +11,5 @@ import org.mapstruct.Mapper;
 public interface ReminderCreateAndUpdateMapper {
     Reminder toEntity(ReminderCreateAndUpdateRequest requestAndResponse);
     ReminderResponse toResponse(Reminder reminder);
-
+    public Reminder updateEntity( ReminderCreateAndUpdateRequest update);
 }

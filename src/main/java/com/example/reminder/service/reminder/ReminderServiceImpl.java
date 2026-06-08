@@ -54,7 +54,7 @@ public class ReminderServiceImpl implements ReminderService{
         Reminder reminder=findOwnedReminder(userId,reminderId,"update");
         equlsUserId(reminder,userId,"update");
 
-        reminder.updateEntity(update,reminder);
+        reminder=reminderMapper.updateEntity(update);
 
         Reminder saved=reminderRepository.save(reminder);
         log.info("Reminder:update success userId={} reminderId={} remindAt={}",
