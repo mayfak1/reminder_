@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.example.reminder.security.SecuritySmokeTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.375 s -- in com.example.reminder.security.SecuritySmokeTest
