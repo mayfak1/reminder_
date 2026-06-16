@@ -1,0 +1,47 @@
+app:
+  notify:
+    fixed-delay-ms: ${APP_NOTIFY_FIXED_DELAY_MS:30000}
+    max-attempts: ${APP_NOTIFY_MAX_ATTEMPTS:5}
+    worker-threads: ${APP_NOTIFY_WORKER_THREADS:4}
+    queue-capacity: ${APP_NOTIFY_QUEUE_CAPACITY:100}
+  telegram:
+    bot-token: ${TELEGRAM_BOT_TOKEN:}
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://keycloak:8080/realms/reminder}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI:http://keycloak:8080/realms/reminder/protocol/openid-connect/certs}
+
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/reminder}
+    username: ${SPRING_DATASOURCE_USERNAME:reminder}
+    password: ${SPRING_DATASOURCE_PASSWORD:reminder}
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: ${SPRING_LIQUIBASE_ENABLED:true}
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+logging:
+  level:
+    root: INFO
+    com.example.reminder: DEBUG
